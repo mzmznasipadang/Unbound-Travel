@@ -9,78 +9,83 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
+    @State private var searchText = ""
+    @State private var showUserSettings = false
+    
     var body: some View {
         NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+            VStack {
+                VStack(alignment: .center, spacing: 0) {  }
+                .padding(0)
+                .frame(width: 285, height: 376, alignment: .center)
+                .background(Color(red: 0.94, green: 0.94, blue: 0.94))
+                .cornerRadius(8)
+                .overlay(
+                  RoundedRectangle(cornerRadius: 8)
+                    .inset(by: 1)
+                    .stroke(Color(red: 0.69, green: 0.69, blue: 0.71), lineWidth: 2)
+                )
+                Text("Accessibility")
+                  .font(
+                    Font.custom("Cabin", size: 45)
+                      .weight(.bold)
+                  )
+                  .multilineTextAlignment(.center)
+                  .foregroundColor(.black)
+                  .frame(width: 262, height: 55, alignment: .top)
+                
+                Text("Traveling should not be a problem for anyone, and we hear you.")
+                  .font(Font.custom("Cabin", size: 18))
+                  .multilineTextAlignment(.center)
+                  .foregroundColor(Color(red: 0.59, green: 0.59, blue: 0.59))
+                  .frame(width: 285, height: 44, alignment: .top)
+                ZStack {
+                    Button(action: {
+                    print("Mwah mwah mwah")
+                                }) {
+                    Text("Continue")
+                     .frame(width: 185, height: 65)
+                      .background(Color.blue)
+                        .foregroundColor(Color.white)
+                            .cornerRadius(30)
                     }
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+                .frame(width: 185, height: 70)
             }
         }
     }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
+struct SearchBar: View {
+    @Binding var text: String
+    var placeholder: String
+    
+    var body: some View {
+        HStack {
+            TextField(placeholder, text: $text)
+                .padding(.leading, 24)
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(8)
+        .padding(.horizontal)
+    }
+}
 
-#Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
+
+struct DetailView: View {
+    var body: some View {
+        Text("Details for location")
+    }
+}
+
+struct UserProfileView: View {
+    var body: some View {
+        Text("User settings")
+    }
 }
